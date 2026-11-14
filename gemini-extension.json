@@ -1,0 +1,11 @@
+{
+  "name": "aktar",
+  "version": "0.6.0",
+  "description": "Upload files to your own S3, Cloudflare R2 or Backblaze B2 bucket through the Aktar app and get the link.",
+  "mcpServers": {
+    "aktar": {
+      "command": "npx",
+      "args": ["-y", "@getaktar/cli@0.6.0", "mcp"]
+    }
+  }
+}

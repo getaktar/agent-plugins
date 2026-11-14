@@ -1,0 +1,66 @@
+name: Bump CLI version
+
+# Follows the @getaktar/cli npm package, so a new CLI release reaches the
+# Claude, Cursor and Gemini CLI plugins without a manual step. Before the
+# commit, the new version's MCP server must start and list its tools.
+on:
+  schedule:
+    - cron: "37 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bump
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Find the latest @getaktar/cli
+        id: npm
+        run: |
+          set -euo pipefail
+          LATEST="$(npm view @getaktar/cli version)"
+          if ! [[ "$LATEST" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Unexpected npm version: '$LATEST'" >&2
+            exit 1
+          fi
+          CURRENT="$(sed -n 's#.*@getaktar/cli@\([0-9.]*\)".*#\1#p' .mcp.json | head -1)"
+          if [ "$LATEST" = "$CURRENT" ]; then
+            echo "Already at $CURRENT"
+          else
+            echo "version=$LATEST" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check that the new version's MCP server starts
+        if: steps.npm.outputs.version != ''
+        env:
+          VERSION: ${{ steps.npm.outputs.version }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          printf '%s\n' \
+            '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"bump","version":"1"}}}' \
+            '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+            '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+            | npx -y "@getaktar/cli@$VERSION" mcp --read-only --root "$RUNNER_TEMP" > tools.json
+          grep -q '"list_bucket"' tools.json
+
+      - name: Update the manifests and push
+        if: steps.npm.outputs.version != ''
+        env:
+          VERSION: ${{ steps.npm.outputs.version }}
+        run: |
+          set -euo pipefail
+          node .github/bump.mjs "$VERSION"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Use @getaktar/cli $VERSION"
+          git push

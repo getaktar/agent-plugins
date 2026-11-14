@@ -1,0 +1,14 @@
+{
+  "name": "aktar",
+  "displayName": "Aktar",
+  "version": "0.6.0",
+  "description": "Upload files to your own S3, Cloudflare R2 or Backblaze B2 bucket through the Aktar app and get the link, plus short and temporary links, bucket browsing and upload history.",
+  "author": {
+    "name": "Mert Topuz",
+    "url": "https://getaktar.com"
+  },
+  "homepage": "https://getaktar.com/cli/",
+  "repository": "https://github.com/getaktar/agent-plugins",
+  "license": "MIT",
+  "keywords": ["upload", "s3", "cloudflare-r2", "backblaze-b2", "storage", "links"]
+}

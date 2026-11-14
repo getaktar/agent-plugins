@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "aktar": {
+      "command": "npx",
+      "args": ["-y", "@getaktar/cli@0.6.0", "mcp"]
+    }
+  }
+}

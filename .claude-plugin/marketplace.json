@@ -1,0 +1,17 @@
+{
+  "name": "aktar",
+  "owner": {
+    "name": "Mert Topuz",
+    "url": "https://getaktar.com"
+  },
+  "metadata": {
+    "description": "Aktar: upload files to your own S3, Cloudflare R2 or Backblaze B2 bucket from Claude and get the link."
+  },
+  "plugins": [
+    {
+      "name": "aktar",
+      "source": "./",
+      "description": "Upload files to your own S3, Cloudflare R2 or Backblaze B2 bucket through the Aktar app and get the link."
+    }
+  ]
+}
